@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
-    "postbuild": "cp -r src/emailmodule/views/layouts dist/emailmodule/views/layouts && cp -r src/emailmodule/views/partials dist/emailmodule/views/partials",
+   
     "build": "npm i && tsc",
     "start": "node dist/server.js",
     "dev": "nodemon - exec 'ts-node' src/server.ts",
