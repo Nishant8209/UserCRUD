@@ -8,6 +8,7 @@ import serverless from 'serverless-http';
 import routes from './routes/index'
 import { errorResponse } from './utils/response'
 import path from 'path';
+import fs from 'fs';
 // Middleware
 app.use(express.json());
 app.use(cors({
@@ -24,13 +25,27 @@ app.use(cookieParser());
 // Routes
 app.use('/api', routes);
 
-app.get("*", (req:any, res:any) => {
-  res.sendFile(path.join(__dirname, "frontend/build", "index.html"));
+
+const buildPath = path.join(__dirname, '../frontend/build');
+app.use(express.static(buildPath));
+
+// Catch-all handler - this should be LAST
+app.get('/{*any}', (req:any, res:any) => {
+    const filePath = path.join(buildPath, 'index.html');
+
+    // Check if file exists before sending
+    if (fs.existsSync(filePath)) {
+        res.sendFile(filePath);
+    } else {
+        console.error('index.html not found at:', filePath);
+        res.status(404).send('Frontend build not found');
+    }
 });
+
 // Error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {
     console.error(err.stack);
     errorResponse(res, 'Something went wrong!', 500, err)
 });
 
-module.exports = serverless(app);
+module.exports = app;
